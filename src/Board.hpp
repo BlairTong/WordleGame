@@ -25,6 +25,8 @@ public:
 
     void applyResult(const std::string& target);
     void triggerShake();
+    void reset();
+    void forceGameOver();
     bool isGameOver() const { return gameOver; }
     bool hasWon() const { return won; }
     int getCurrentRow() const { return currentRow; }

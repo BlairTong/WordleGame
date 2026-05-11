@@ -4,11 +4,12 @@ A Wordle clone built with C++17 and SFML 3.
 
 ## Features
 
-- Classic 6×5 Wordle gameplay with a clean on-screen QWERTY keyboard
+- Classic 6x5 Wordle gameplay with a clean on-screen QWERTY keyboard
 - Smooth tile animations: pop on input, flip reveal on submission, shake on invalid word
 - Duplicate-aware word comparison (handles repeated letters correctly)
 - Built-in dictionary with random target word selection
 - Real-time keyboard color updates showing letter status
+- Restart and give up with visual buttons and confirmation dialogs
 
 ## Dependencies
 
@@ -37,9 +38,10 @@ If no system font is found, place a `.ttf` file at `assets/fonts/DejaVuSans.ttf`
 
 | Key | Action |
 |-----|--------|
-| A–Z | Enter a letter |
+| A-Z | Enter a letter |
 | Backspace | Delete last letter |
 | Enter | Submit guess |
+| Click buttons | Restart / Give Up below the keyboard |
 
 ## Project Structure
 
@@ -47,7 +49,7 @@ If no system font is found, place a `.ttf` file at `assets/fonts/DejaVuSans.ttf`
 ├── src/
 │   ├── main.cpp        # Entry point
 │   ├── Game.hpp/cpp    # Main loop, rendering, input handling
-│   ├── Board.hpp/cpp   # 6×5 grid and word logic
+│   ├── Board.hpp/cpp   # 6x5 grid and word logic
 │   ├── Tile.hpp/cpp    # Individual tile with animations
 │   └── Dictionary.hpp/cpp  # Word list and validation
 ├── assets/

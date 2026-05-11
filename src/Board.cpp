@@ -135,3 +135,20 @@ void Board::triggerShake() {
         tiles[currentRow][c].triggerShake();
     }
 }
+
+void Board::reset() {
+    for (int r = 0; r < Rows; ++r) {
+        for (int c = 0; c < Cols; ++c) {
+            tiles[r][c].reset();
+        }
+    }
+    currentRow = 0;
+    currentCol = 0;
+    lastAnimatedRow = -1;
+    gameOver = false;
+    won = false;
+}
+
+void Board::forceGameOver() {
+    gameOver = true;
+}

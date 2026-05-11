@@ -19,6 +19,7 @@ public:
     void triggerPop();
     void triggerFlip(State resultState);
     void triggerShake();
+    void reset();
 
     char getLetter() const { return letter; }
     State getState() const { return currentState; }
@@ -49,6 +50,7 @@ private:
     // Shake animation
     bool shaking = false;
     float shakeTime = 0.f;
+    bool invalidHighlight = false;
     static constexpr float ShakeDuration = 0.4f;
     static constexpr float ShakeIntensity = 8.f;
 

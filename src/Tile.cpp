@@ -30,6 +30,23 @@ void Tile::triggerFlip(State resultState) {
 void Tile::triggerShake() {
     shaking = true;
     shakeTime = 0.f;
+    invalidHighlight = true;
+}
+
+void Tile::reset() {
+    letter = ' ';
+    currentState = State::Empty;
+    targetState = State::Empty;
+    popping = false;
+    popTime = 0.f;
+    flipping = false;
+    flipTime = 0.f;
+    shaking = false;
+    shakeTime = 0.f;
+    invalidHighlight = false;
+    scaleY = 1.f;
+    currentScale = 1.f;
+    shakeOffset = 0.f;
 }
 
 bool Tile::isAnimating() const {
@@ -73,6 +90,7 @@ void Tile::update(float dt) {
         if (shakeTime >= ShakeDuration) {
             shaking = false;
             shakeOffset = 0.f;
+            invalidHighlight = false;
         } else {
             shakeOffset = std::sin(shakeTime * 30.f) * ShakeIntensity * (1.f - shakeTime / ShakeDuration);
         }
@@ -105,7 +123,10 @@ void Tile::draw(sf::RenderWindow& window, const sf::Font& font) const {
         basePosition.y + offset + (Size - Size * scaleY) * 0.5f
     });
 
-    if (currentState != State::Empty) {
+    if (invalidHighlight) {
+        rect.setFillColor(sf::Color(0xe5, 0x39, 0x35));
+        rect.setOutlineThickness(0);
+    } else if (currentState != State::Empty) {
         rect.setFillColor(getColorForState(currentState));
         rect.setOutlineThickness(0);
     } else {

@@ -6,6 +6,8 @@
 #include <map>
 #include <string>
 
+enum class ConfirmAction { None, Restart, GiveUp };
+
 class Game {
 public:
     Game();
@@ -24,6 +26,15 @@ private:
     void drawKeyboard(sf::RenderWindow& window) const;
     void drawOverlay(sf::RenderWindow& window) const;
     void drawShakeMessage(sf::RenderWindow& window) const;
+
+    void initButtons();
+    void handleMouseClick(float x, float y);
+    void handleConfirmClick(float x, float y);
+    void drawButtons(sf::RenderWindow& window) const;
+    void drawConfirmDialog(sf::RenderWindow& window) const;
+    void restart();
+    void forfeit();
+
     bool loadFont();
 
     sf::RenderWindow window;
@@ -35,6 +46,16 @@ private:
     bool initialized = false;
     bool waitingForAnimation = false;
     float shakeMessageTimer = 0.f;
+    bool playerForfeited = false;
+
+    ConfirmAction pendingConfirm = ConfirmAction::None;
+
+    struct Button {
+        sf::FloatRect bounds;
+        std::string label;
+    };
+    Button restartButton;
+    Button giveUpButton;
 
     struct KeyState {
         Tile::State state = Tile::State::Empty;
@@ -44,4 +65,6 @@ private:
 
     static constexpr int WindowWidth = 600;
     static constexpr int WindowHeight = 800;
+    static constexpr float ButtonWidth = 100.f;
+    static constexpr float ButtonHeight = 36.f;
 };
