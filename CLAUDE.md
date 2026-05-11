@@ -24,13 +24,15 @@ The game requires a TrueType font. `Game::loadFont()` tries several system font 
 
 ### Game Loop and Ownership (`Game.hpp/cpp`)
 
-`Game` owns the `sf::RenderWindow`, `Board`, and `Dictionary`. The loop lives in `Game::run()` and delegates to `processEvents()`, `update(float dt)`, and `render()`. Input is ignored while `waitingForAnimation` is true (set after a valid Enter submission, cleared when the row finishes animating).
+`Game` owns the `sf::RenderWindow`, `Board`, and `Dictionary`. The loop lives in `Game::run()` and delegates to `processEvents()`, `update(float dt)`, and `render()`. Input is ignored while `waitingForAnimation` is true (set after a valid Enter submission, cleared when the row finishes animating) or when `board.isGameOver()` is true.
+
+Window size: 600×800 px, framerate cap at 60 fps.
 
 Input handling:
-- `sf::Event::TextEntered` for A–Z letters.
+- `sf::Event::TextEntered` for A–Z letters (both uppercase and lowercase accepted, converted to lowercase).
 - `sf::Event::KeyPressed` for Backspace and Enter.
 
-`Game` also maintains `keyboardColors`, a `map<char, KeyState>` used to render the on-screen QWERTY keyboard with colors updated after each submitted guess.
+`Game` also maintains `keyboardColors`, a `map<char, KeyState>` used to render the on-screen QWERTY keyboard with colors updated after each submitted guess (priority: Correct > Present > Wrong > Empty).
 
 ### Grid and Word Logic (`Board.hpp/cpp`)
 
@@ -47,25 +49,33 @@ Input handling:
 Each `Tile` handles its own animations using delta time:
 - **Pop**: triggered on letter entry. Scale animates `0.8 → 1.1 → 1.0` over `0.15s`.
 - **Flip/Reveal**: triggered by `Board::applyResult()`. `scaleY` uses `cos(t * π)` so the tile appears to rotate around its horizontal center. At `scaleY < 0` the background color switches to the result color. Duration is `0.5s` per tile.
-- **Shake**: triggered when an invalid word is submitted. Horizontal offset follows `sin(t) × intensity` decaying over `0.4s`.
+- **Shake**: triggered when an invalid word is submitted. Horizontal offset follows `sin(t × 30) × 8 × (1 − t/duration)` decaying over `0.4s`.
 
-`Tile::isAnimating()` returns true if any animation is active; `Board::isRowAnimating()` queries the current row to block input during reveals.
+`Tile::isAnimating()` returns true if any animation is active; `Board::isRowAnimating()` queries `lastAnimatedRow` to block input during reveals.
 
 ### Dictionary (`Dictionary.hpp/cpp`)
 
 Loads `assets/data/words.txt` (one uppercase 5-letter word per line) into an `std::unordered_set` for O(1) `isValidWord()` checks. `getRandomWord()` selects from a parallel `std::vector` using `std::mt19937`.
 
+### UI Overlays
+
+- **Shake message**: When an invalid word is submitted, "Not in word list" appears near the top of the screen for 1.2s (`shakeMessageTimer`).
+- **Game over overlay**: When `board.isGameOver()` is true, a semi-transparent overlay covers the screen showing "You Win!" or "Game Over" along with the target word.
+
 ### Colors
 
-| Meaning  | Hex       |
-|----------|-----------|
-| Background | `#121213` |
-| Correct    | `#538d4e` |
-| Present    | `#b59f3b` |
-| Wrong      | `#3a3a3c` |
-| Empty border | `#3a3a3c` |
+| Usage | Hex |
+|-------|-----|
+| Background (window clear) | `#f5f5f0` |
+| Tile — Correct | `#538d4e` |
+| Tile — Present | `#b59f3b` |
+| Tile — Wrong | `#3a3a3c` |
+| Tile — Empty (unfilled border) | `#d3d6da` (no letter) / `#878a8c` (has letter) |
+| Keyboard — uncolored key | `#d3d6da` |
+| Keyboard — key text | `#1a1a1a` |
+| Tile text | `#1a1a1a` |
 
-These are hard-coded in `Tile::getColorForState()`, `Game::drawKeyboard()`, and `Game::render()`.
+Tile and keyboard colors are hard-coded in `Tile::getColorForState()`, `Tile::getBorderColor()`, `Game::drawKeyboard()`, and `Game::render()`.
 
 ### Asset Layout
 
